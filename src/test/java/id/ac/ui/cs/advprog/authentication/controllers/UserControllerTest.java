@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.Mockito.*;
@@ -79,5 +80,27 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/user/all"))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetUserByEmail_UserFound() throws Exception {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setFullName("Erz ZX");
+        userEntity.setEmail("zx@example.com");
+
+        when(userService.getUserByEmail("zx@example.com")).thenReturn(Optional.of(userEntity));
+
+        mockMvc.perform(get("/api/user/get/zx@example.com"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.fullName", is("Erz ZX")))
+            .andExpect(jsonPath("$.email", is("zx@example.com")));
+    }
+
+    @Test
+    public void testGetUserByEmail_UserNotFound() throws Exception {
+        when(userService.getUserByEmail("zx@example.com")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/user/get/zx@example.com"))
+            .andExpect(status().isNotFound());
     }
 }

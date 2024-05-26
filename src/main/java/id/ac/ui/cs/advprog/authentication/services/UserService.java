@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -20,6 +21,10 @@ public class UserService {
   @Async("taskExecutorForHeavyTasks")
   public CompletableFuture<List<UserEntity>> allUsers() {
     return CompletableFuture.supplyAsync(userRepository::findAll);
+  }
+
+  public Optional<UserEntity> getUserByEmail(String email){
+    return userRepository.findByEmail(email);
   }
 
   @Async()
